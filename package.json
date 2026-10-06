@@ -1,0 +1,21 @@
+{
+  "name": "vanta",
+  "version": "1.0.0",
+  "description": "Local-first terminal AI client for Ollama",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/index.jsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "ink": "^8.0.0",
+    "react": "^19.3.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}
