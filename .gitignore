@@ -6,3 +6,7 @@ node_modules/
 .DS_Store
 .vscode/
 .idea/
+
+# Local development/debug scripts
+test_*.py
+test_*.js

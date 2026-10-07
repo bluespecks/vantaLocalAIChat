@@ -18,21 +18,47 @@ export const getModels = async (url = 'http://localhost:11434') => {
   }
 };
 
-export const chat = async (model, prompt, url = 'http://localhost:11434') => {
-  try {
-    const response = await fetch(`${url}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content: prompt }],
-        stream: false
-      })
-    });
-    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-    const data = await response.json();
-    return data.message.content;
-  } catch (error) {
-    throw error;
+export async function* streamChat(model, prompt, url = 'http://localhost:11434') {
+  const response = await fetch(`${url}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      stream: true
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error ${response.status}`);
   }
-};
+
+  // Debug: Is this a stream?
+  // console.error("Is stream?", response.body && typeof response.body.getReader === 'function');
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    let lines = buffer.split('\n');
+    buffer = lines.pop(); // last chunk
+
+    for (const line of lines) {
+      if (line.trim() === '') continue;
+      try {
+        const chunk = JSON.parse(line);
+        if (chunk.message?.content) {
+          yield chunk.message.content;
+        }
+        if (chunk.done) return;
+      } catch (err) {
+        throw new Error('Malformed JSON chunk');
+      }
+    }
+  }
+}

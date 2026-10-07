@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { render, Text, Box, useInput, useApp } from 'ink';
-import { checkOllama, getModels, chat } from './ollama/client.js';
+import { checkOllama, getModels, streamChat } from './ollama/client.js';
 
 function App() {
   const [status, setStatus] = useState('checking');
@@ -27,71 +27,66 @@ function App() {
     init();
   }, []);
 
-  useInput(async (input, key) => {
-    // Ctrl+C exit
+  const handleSend = async (userQuery) => {
+    setPrompt('');
+    setMessages(prev => [
+      ...prev,
+      { sender: 'user', text: userQuery },
+      { sender: 'assistant', text: '', model: selectedModel }
+    ]);
+    setLoading(true);
+
+    try {
+      for await (const chunk of streamChat(selectedModel, userQuery)) {
+        setMessages(prev => {
+          const next = [...prev];
+          const last = { ...next[next.length - 1] };
+          last.text += chunk;
+          next[next.length - 1] = last;
+          return next;
+        });
+      }
+    } catch (err) {
+      setMessages(prev => {
+        const next = [...prev];
+        const last = { ...next[next.length - 1] };
+        last.text += `\n[Error: ${err.message}]`;
+        next[next.length - 1] = last;
+        return next;
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useInput((input, key) => {
     if (input === 'c' && key.ctrl) {
       exit();
       return;
     }
 
-    // Model selection mode
     if (!selectedModel) {
-      if (key.upArrow) {
-        setModelIndex(prev => (prev - 1 + models.length) % models.length);
-      } else if (key.downArrow) {
-        setModelIndex(prev => (prev + 1) % models.length);
-      } else if (key.return || input === '\r' || input === '\n') {
-        if (models.length > 0) setSelectedModel(models[modelIndex]);
-      }
+      if (key.upArrow) setModelIndex(prev => (prev - 1 + models.length) % models.length);
+      else if (key.downArrow) setModelIndex(prev => (prev + 1) % models.length);
+      else if (key.return) if (models.length > 0) setSelectedModel(models[modelIndex]);
       return;
     }
 
-    // Chat input mode
     if (loading) return;
 
-    if (key.return || input === '\r' || input === '\n') {
+    if (key.return) {
       if (prompt.trim().length === 0) return;
-      const userQuery = prompt;
-      setPrompt('');
-      setMessages(prev => [...prev, { sender: 'user', text: userQuery }]);
-      setLoading(true);
-
-      try {
-        const responseData = await chat(selectedModel, userQuery);
-        setMessages(prev => [...prev, { sender: 'assistant', text: responseData }]);
-      } catch (err) {
-        setMessages(prev => [...prev, { sender: 'assistant', text: `Error: ${err.message}` }]);
-      } finally {
-        setLoading(false);
-      }
+      handleSend(prompt);
     } else if (key.backspace || key.delete) {
       setPrompt(prev => prev.slice(0, -1));
     } else if (input && !key.ctrl && !key.meta) {
-      if (input.includes('\r') || input.includes('\n')) {
-        const clean = input.replace(/[\r\n]/g, '');
-        const fullPrompt = (prompt + clean).trim();
-        if (fullPrompt.length > 0) {
-          setPrompt('');
-          setMessages(prev => [...prev, { sender: 'user', text: fullPrompt }]);
-          setLoading(true);
-          try {
-            const responseData = await chat(selectedModel, fullPrompt);
-            setMessages(prev => [...prev, { sender: 'assistant', text: responseData }]);
-          } catch (err) {
-            setMessages(prev => [...prev, { sender: 'assistant', text: `Error: ${err.message}` }]);
-          } finally {
-            setLoading(false);
-          }
-        }
-      } else {
-        setPrompt(prev => prev + input);
-      }
+      setPrompt(prev => prev + input);
     }
   });
 
   return (
     <Box flexDirection="column">
-      <Text bold>Vanta — Phase 1</Text>
+      <Text bold>Vanta — Phase 2 (Streaming)</Text>
       <Text color="gray" dimColor>Ctrl+C to exit</Text>
       <Box marginTop={1}>
         <Text>Ollama: </Text>
@@ -129,14 +124,14 @@ function App() {
 
               {messages.map((m, i) => (
                 <Box key={i} flexDirection="column" marginTop={1}>
-                  <Text bold>{m.sender === 'user' ? 'User:' : 'Assistant:'}</Text>
+                  <Text bold>{m.sender === 'user' ? 'User:' : `Assistant · ${m.model || selectedModel}:`}</Text>
                   <Text>{m.text}</Text>
                 </Box>
               ))}
 
               <Box flexDirection="column" marginTop={1}>
                 <Text bold>User:</Text>
-                <Text>{loading ? 'Thinking...' : (prompt || <Text color="gray">_</Text>)}</Text>
+                <Text>{loading ? 'Generating...' : (prompt || <Text color="gray">_</Text>)}</Text>
               </Box>
             </Box>
           )}
