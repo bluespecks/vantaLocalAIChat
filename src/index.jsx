@@ -86,7 +86,7 @@ function App() {
 
   return (
     <Box flexDirection="column">
-      <Text bold>Vanta — Phase 2 (Streaming)</Text>
+      <Text bold>Vanta — Phase 2B (Streaming Cleanup)</Text>
       <Text color="gray" dimColor>Ctrl+C to exit</Text>
       <Box marginTop={1}>
         <Text>Ollama: </Text>
@@ -129,10 +129,18 @@ function App() {
                 </Box>
               ))}
 
-              <Box flexDirection="column" marginTop={1}>
-                <Text bold>User:</Text>
-                <Text>{loading ? 'Generating...' : (prompt || <Text color="gray">_</Text>)}</Text>
-              </Box>
+              {loading && (
+                <Box marginTop={1}>
+                  <Text color="gray">⠋ Generating...</Text>
+                </Box>
+              )}
+
+              {!loading && (
+                <Box flexDirection="column" marginTop={1}>
+                  <Text bold>User:</Text>
+                  <Text>{prompt || <Text color="gray">_</Text>}</Text>
+                </Box>
+              )}
             </Box>
           )}
         </>
