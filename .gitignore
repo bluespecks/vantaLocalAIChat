@@ -7,6 +7,16 @@ node_modules/
 .vscode/
 .idea/
 
-# Local development/debug scripts
-test_*.py
-test_*.js
+# Root-level local debugging scripts
+/test_*.py
+/test_*.js
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+pip_freeze.txt

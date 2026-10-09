@@ -2,16 +2,29 @@
 
 Local-first terminal AI client for Ollama.
 
-## Status
-Phase 0 — Foundation
+*Note: Ollama integration is not yet implemented.*
 
-## Tech Stack
-- JavaScript (Node.js)
-- React
-- Ink
+## Prerequisites
+- Python 3.14+
+- `direnv` installed and allowed
 
-## Development
+## Initial Setup
+1. `direnv allow`
+2. `./setup_and_test.sh` (this will create .venv if missing, install dependencies, and run tests)
+
+If not using `direnv`:
 ```bash
-npm install
-npm run dev
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Launch
+```bash
+python3 -m vanta.app
+```
+
+## Testing
+```bash
+pytest tests/
 ```
