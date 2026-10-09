@@ -1,6 +1,6 @@
 from textual.app import App, ComposeResult
-from textual.containers import Center, Vertical
-from textual.widgets import Footer, Header, Static
+from textual.containers import Vertical
+from textual.widgets import Footer, Header, Static, Input
 
 
 class VantaApp(App[None]):
@@ -10,8 +10,6 @@ class VantaApp(App[None]):
     SUB_TITLE = "Your local AI agent"
 
     CSS_PATH = "app.tcss"
-
-    # Properly disable command palette in Textual 8.x
     ENABLE_COMMAND_PALETTE = False
 
     BINDINGS = [
@@ -21,25 +19,12 @@ class VantaApp(App[None]):
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
 
-        with Center(id="welcome-area"):
-            with Vertical(id="welcome-panel"):
-                yield Static("V A N T A", id="brand")
-                yield Static("Your local AI agent.", id="tagline")
-                yield Static(
-                    "Private by design. Powered by your local models.",
-                    id="description",
-                )
-                yield Static(
-                    "LOCAL-FIRST  /  OLLAMA",
-                    id="status",
-                )
-                yield Static(
-                    "A new way to work with local AI.",
-                    id="hint",
-                )
+        # Main layout container
+        with Vertical(id="main-viewport"):
+            yield Static("Start a conversation...", id="chat-viewport")
+            yield Input(placeholder="Type your message...", id="input-area")
 
-        # Ensure Footer does not expose palette actions
-        yield Footer(show_command_palette=False)
+        yield Footer()
 
 
 if __name__ == "__main__":
