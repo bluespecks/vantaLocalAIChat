@@ -22,11 +22,13 @@ Footer {
     width: 100%;
     height: 1fr;
     min-height: 5;
-    padding: 1;
+    padding: 1 2;
     background: #0b0e14;
     color: #aab5c8;
-    /* Aligned top-left instead of center middle */
-    align: left top;
+    overflow-y: scroll;
+    scrollbar-color: #2e3b52 #0b0e14;
+    scrollbar-size-vertical: 1;
+    scrollbar-size-horizontal: 0;
 }
 
 #input-area {
@@ -35,4 +37,124 @@ Footer {
     margin: 1 2;
     background: #111722;
     border: round #414d63;
+    color: #dce3ec;
+}
+
+#input-area:focus {
+    border: round #8be9fd;
+}
+
+/* Base message container */
+ChatMessage {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1;
+    layout: vertical;
+}
+
+.message-header {
+    height: auto;
+    margin-bottom: 0;
+    padding: 0 1;
+}
+
+/* User message: clean prompt line, bright crisp text, no heavy boxes */
+UserMessage {
+    background: transparent;
+    padding: 0 1;
+}
+
+UserMessage .user-content {
+    color: #dce3ec;
+    padding: 0 1 0 2;
+    margin-top: 0;
+    width: 100%;
+}
+
+/* Assistant message: comfortable reading spacing, left accent line */
+AssistantMessage {
+    background: transparent;
+    padding: 0 1;
+}
+
+AssistantMessage .assistant-body {
+    border-left: outer #414d63;
+    padding: 0 1 0 1;
+    margin: 0;
+    width: 100%;
+    height: auto;
+}
+
+AssistantMessage Markdown {
+    background: transparent;
+    color: #aab5c8;
+    padding: 0;
+    margin: 0;
+    height: auto;
+}
+
+AssistantMessage MarkdownH1,
+AssistantMessage MarkdownH2,
+AssistantMessage MarkdownH3 {
+    text-align: left;
+    color: #8be9fd;
+    text-style: bold;
+    margin: 1 0 0 0;
+}
+
+AssistantMessage MarkdownParagraph {
+    margin: 0 0 1 0;
+    color: #aab5c8;
+}
+
+AssistantMessage MarkdownFence {
+    background: #111722;
+    border: round #2e3b52;
+    color: #e2e8f0;
+    margin: 1 0;
+    padding: 0 1;
+}
+
+AssistantMessage MarkdownBlock > .code_inline {
+    background: #182030;
+    color: #8be9fd;
+    text-style: bold;
+}
+
+AssistantMessage MarkdownBlock > .strong {
+    color: #f1f5f9;
+    text-style: bold;
+}
+
+AssistantMessage MarkdownBlock > .em {
+    color: #cad2e0;
+    text-style: italic;
+}
+
+/* System notice: unobtrusive, dim, centered or compact */
+SystemNotice {
+    background: transparent;
+    height: auto;
+    margin: 1 0;
+    padding: 0 1;
+}
+
+SystemNotice .system-notice-text {
+    text-align: center;
+    color: #6272a4;
+    text-style: italic;
+}
+
+/* Error message: distinguishable but unobtrusive coral accent */
+ErrorMessage {
+    background: transparent;
+    height: auto;
+    margin: 1 0;
+    padding: 0 1;
+}
+
+ErrorMessage .error-text {
+    border-left: outer #e06c75;
+    padding: 0 1 0 1;
+    color: #e06c75;
 }
