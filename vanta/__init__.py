@@ -6,11 +6,27 @@ from vanta.messages import (
     SystemNotice,
     UserMessage,
 )
+from vanta.ollama_client import (
+    ModelInfo,
+    OllamaClient,
+    OllamaConnectionError,
+    OllamaError,
+    OllamaHTTPError,
+    OllamaResponseError,
+    OllamaTimeoutError,
+)
 
 __all__ = [
     "AssistantMessage",
     "ChatMessage",
     "ErrorMessage",
+    "ModelInfo",
+    "OllamaClient",
+    "OllamaConnectionError",
+    "OllamaError",
+    "OllamaHTTPError",
+    "OllamaResponseError",
+    "OllamaTimeoutError",
     "SystemNotice",
     "UserMessage",
     "VantaApp",
